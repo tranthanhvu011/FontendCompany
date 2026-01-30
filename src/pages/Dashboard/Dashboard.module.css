@@ -1,0 +1,220 @@
+/* Scrollable Navigation Bar Styles */
+
+.navbarContainer {
+  background: var(--nav-bg);
+  padding: 16px 0;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 100%;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navbarWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Nút scroll trái/phải */
+.scrollBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--nav-btn-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--nav-btn-text);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.scrollBtn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.scrollBtn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.scrollBtn.left {
+  left: 10px;
+}
+
+.scrollBtn.right {
+  right: 10px;
+}
+
+/* Container chứa các button */
+.navScrollContainer {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  cursor: grab;
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.navScrollContainer:active {
+  cursor: grabbing;
+}
+
+.navScrollContainer::-webkit-scrollbar {
+  display: none;
+  /* Chrome/Safari */
+}
+
+/* Danh sách button */
+.navList {
+  display: flex;
+  gap: 12px;
+  padding: 4px 45px;
+  user-select: none;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Style cho mỗi button */
+.navBtn {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  background: var(--nav-btn-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  color: var(--nav-btn-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.navBtn:hover {
+  background: var(--nav-btn-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.navBtn:active {
+  transform: translateY(0);
+}
+
+.navBtn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbarWrapper {
+    padding: 0 5px;
+  }
+
+  .navList {
+    padding: 0 35px;
+    gap: 10px;
+  }
+
+  .scrollBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .navBtn {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbarContainer {
+    border-radius: 8px;
+    padding: 12px 0;
+  }
+
+  .navbarWrapper {
+    padding: 0;
+  }
+
+  .scrollBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .navBtn {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .navList {
+    gap: 8px;
+    padding: 0 30px;
+  }
+}
+
+/* Animation cho nút scroll xuất hiện */
+.scrollBtn {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.loadMoreWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 2px 0;
+}
+
+.loadMoreBtn {
+  background: #10b981;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.loadMoreBtn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
