@@ -17,6 +17,8 @@ interface RegisterFormProps {
 export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
     const [showPassword, setShowPassword] = useState(false)
     const [showOtpSection, setShowOtpSection] = useState(false)
+    const [usernameValid, setUsernameValid] = useState(false)
+    const [emailValid, setEmailValid] = useState(false)
     const { checkUsername, checkEmail, sendOtp } = useAuth()
     const { otpCooldown, isOtpSending, otpSent, sendOtpToEmail, initializeCooldown } = useOtpCooldown()
 
@@ -29,7 +31,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
         formState: { errors, dirtyFields },
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
     })
 
     const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -49,37 +51,49 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
     // ========== Debounce API Checks ==========
     const handleUsernameCheck = useCallback((username: string) => {
         if (usernameCheckTimeout.current) clearTimeout(usernameCheckTimeout.current)
+        setUsernameValid(false) // reset tick khi đang gõ
         if (username.length >= 3) {
             usernameCheckTimeout.current = setTimeout(async () => {
                 try {
                     const exists = await checkUsername(username)
                     if (exists) {
+                        setUsernameValid(false)
                         setError('username', { message: 'Username đã tồn tại' })
                     } else {
+                        setUsernameValid(true)
                         clearErrors('username')
                     }
                 } catch {
+                    setUsernameValid(false)
                     setError('username', { message: 'Không thể kiểm tra username' })
                 }
             }, 500)
+        } else {
+            setUsernameValid(false)
         }
     }, [checkUsername, setError, clearErrors])
 
     const handleEmailCheck = useCallback((email: string) => {
         if (emailCheckTimeout.current) clearTimeout(emailCheckTimeout.current)
+        setEmailValid(false) // reset tick khi đang gõ
         if (isValidEmail(email)) {
             emailCheckTimeout.current = setTimeout(async () => {
                 try {
                     const exists = await checkEmail(email)
                     if (exists) {
+                        setEmailValid(false)
                         setError('email', { message: 'Email đã tồn tại' })
                     } else {
+                        setEmailValid(true)
                         clearErrors('email')
                     }
                 } catch {
+                    setEmailValid(false)
                     setError('email', { message: 'Không thể kiểm tra email' })
                 }
             }, 500)
+        } else {
+            setEmailValid(false)
         }
     }, [checkEmail, setError, clearErrors])
 
@@ -131,11 +145,14 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                                 onChange: (e) => handleUsernameCheck(e.target.value),
                             })}
                         />
-                        {!errors.username && (watch('username')?.length ?? 0) >= 3 && (
+                        {usernameValid && (
                             <span className={styles.inputSuccess}>✓</span>
                         )}
                     </div>
-                    {dirtyFields.username && errors.username && (
+                    {usernameValid && !errors.username && (
+                        <p className={styles.successText}>Username hợp lệ ✓</p>
+                    )}
+                    {errors.username && (
                         <p className={styles.errorText}>{errors.username.message}</p>
                     )}
                 </div>
@@ -151,12 +168,15 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                                 onChange: (e) => handleEmailCheck(e.target.value),
                             })}
                         />
-                        {!errors.email && isValidEmail(watch('email') || '') && (
+                        {emailValid && (
                             <span className={styles.inputSuccess}>✓</span>
                         )}
                         <FiMail className={styles.inputIcon} />
                     </div>
-                    {dirtyFields.email && errors.email && (
+                    {emailValid && !errors.email && (
+                        <p className={styles.successText}>Email hợp lệ ✓</p>
+                    )}
+                    {errors.email && (
                         <p className={styles.errorText}>{errors.email.message}</p>
                     )}
                 </div>

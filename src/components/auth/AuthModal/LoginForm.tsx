@@ -3,15 +3,16 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { loginSchema, type LoginFormData } from '@/utils/validations'
-import { authService } from '@/services/authService'
+import { useAuth } from '@/contexts/AuthContext'
+
 import styles from './AuthModal.module.css'
 
 interface LoginFormProps {
     onClose: () => void
     onSwitchView: (view: 'register' | 'forgot') => void
 }
-
 export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
+    const { login } = useAuth()
     const [showPassword, setShowPassword] = useState(false)
 
     const { register, handleSubmit, formState: { errors, dirtyFields } } = useForm<LoginFormData>({
@@ -21,10 +22,10 @@ export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
 
     const onSubmit = async (data: LoginFormData) => {
         try {
-            await authService.login({ email: data.email, password: data.password })
+            await login(data.email, data.password)
             onClose()
         } catch {
-            // interceptor hiện toast error
+
         }
     }
 

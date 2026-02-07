@@ -413,6 +413,13 @@
     margin-bottom: 0;
 }
 
+.successText {
+    color: #10b981;
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
 @keyframes spin {
     from {
         transform: translateY(-50%) rotate(0deg);

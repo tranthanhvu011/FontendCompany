@@ -23,11 +23,10 @@ export interface ApiResponse<T> {
     success: boolean
 }
 
-export interface LoginCredentials {
+export interface LoginRequest {
     email: string
     password: string
 }
-
 export interface RegisterData {
     name: string
     email: string
@@ -38,4 +37,9 @@ export interface RegisterRequest {
     email: string
     password: string
     otp: string
+}
+export interface MessageResponse {
+    success: boolean
+    message: string
+    data?: Record<string, any>
 }

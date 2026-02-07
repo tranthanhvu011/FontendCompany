@@ -2,6 +2,11 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { toast } from '@/utils/toastManager'
 
+// Custom config với option silent để tắt toast
+export interface SilentAxiosRequestConfig extends AxiosRequestConfig {
+    _silent?: boolean
+}
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
 class ApiClient {
@@ -33,7 +38,10 @@ class ApiClient {
         // Response interceptor - auto toast
         this.client.interceptors.response.use(
             response => {
-                // Auto hiện success toast nếu API trả về message
+                const config = response.config as SilentAxiosRequestConfig
+                // Bỏ qua toast nếu silent
+                if (config._silent) return response
+
                 const data = response.data
                 if (data?.message && data?.success === true) {
                     toast.success(data.message)
@@ -41,39 +49,41 @@ class ApiClient {
                 return response
             },
             error => {
-                // Auto hiện error toast cho mọi lỗi API
-                const message = error.response?.data?.message
-                    || error.response?.data?.error
-                    || 'Có lỗi xảy ra, vui lòng thử lại'
-                toast.error(message)
+                const config = error.config as SilentAxiosRequestConfig
+                // Bỏ qua toast nếu silent
+                if (!config._silent) {
+                    const message = error.response?.data?.message
+                        || error.response?.data?.error
+                        || 'Có lỗi xảy ra, vui lòng thử lại'
+                    toast.error(message)
+                }
 
-                // Redirect nếu 401 Unauthorized
+                // Xóa token nếu 401 Unauthorized
                 if (error.response?.status === 401) {
-                    localStorage.removeItem('authToken')
-                    localStorage.removeItem('user')
-                    window.location.href = '/login'
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
                 }
                 return Promise.reject(error)
             }
         )
     }
 
-    async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    async get<T>(url: string, config?: SilentAxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.get(url, config)
         return response.data
     }
 
-    async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    async post<T>(url: string, data?: any, config?: SilentAxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.post(url, data, config)
         return response.data
     }
 
-    async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    async put<T>(url: string, data?: any, config?: SilentAxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.put(url, data, config)
         return response.data
     }
 
-    async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    async delete<T>(url: string, config?: SilentAxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.delete(url, config)
         return response.data
     }

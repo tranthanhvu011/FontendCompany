@@ -18,10 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false)
     }, [])
 
-    const login = async (email: string, password: string) => {
-        const response = await authService.login({ email, password })
-        setUser(response.data.user)
-    }
+
 
     const logout = () => {
         authService.logout()
@@ -30,14 +27,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkUsername = async (username: string): Promise<boolean> => {
         const response = await authService.checkUsername(username)
-        return response.data  // boolean: true = đã tồn tại, false = chưa có
+        return response.data  // ApiResponse.data = boolean (apiClient đã unwrap Axios)
     }
     const checkEmail = async (email: string): Promise<boolean> => {
         const response = await authService.checkEmail(email)
-        return response.data
+        return response.data  // ApiResponse.data = boolean (apiClient đã unwrap Axios)
     }
     const sendOtp = async (email: string) => {
         await authService.sendOtp(email)
+    }
+    const login = async (email: string, password: string) => {
+        const response = await authService.login({ email, password })
+        const tokens = response.data?.data
+        if (tokens?.accessToken) {
+            localStorage.setItem('accessToken', tokens.accessToken)
+            localStorage.setItem('refreshToken', tokens.refreshToken)
+        }
     }
 
     const value: AuthContextType = {
