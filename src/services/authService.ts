@@ -55,11 +55,11 @@ export const authService = {
         return !!localStorage.getItem('authToken')
     },
     checkUsername: (username: string) =>
-        apiClient.get<ApiResponse<boolean>>(`/api/v1/auth/check-username?username=${username}`),
+        apiClient.get<ApiResponse<boolean>>(`/v1/auth/check-username?username=${username}`),
     checkEmail: (email: string) =>
-        apiClient.get(`/api/v1/auth/check-email=${email}`),
+        apiClient.get<ApiResponse<boolean>>(`/v1/auth/check-email?email=${email}`),
     sendOtp: (email: string) =>
-        apiClient.post(`/api/v1/auth/send-otp`, { email }),
+        apiClient.post<ApiResponse<{ success: boolean; message: string }>>(`/v1/auth/send-otp`, { email }),
     register: (data: RegisterRequest) =>
-        apiClient.post(`/api/v1/auth/register`, data),
+        apiClient.post<ApiResponse<{ success: boolean; message: string }>>(`/v1/auth/register`, data),
 }

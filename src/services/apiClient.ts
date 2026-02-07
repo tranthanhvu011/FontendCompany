@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { toast } from '@/utils/toastManager'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -29,10 +30,24 @@ class ApiClient {
             }
         )
 
-        // Response interceptor
+        // Response interceptor - auto toast
         this.client.interceptors.response.use(
-            response => response,
+            response => {
+                // Auto hiện success toast nếu API trả về message
+                const data = response.data
+                if (data?.message && data?.success === true) {
+                    toast.success(data.message)
+                }
+                return response
+            },
             error => {
+                // Auto hiện error toast cho mọi lỗi API
+                const message = error.response?.data?.message
+                    || error.response?.data?.error
+                    || 'Có lỗi xảy ra, vui lòng thử lại'
+                toast.error(message)
+
+                // Redirect nếu 401 Unauthorized
                 if (error.response?.status === 401) {
                     localStorage.removeItem('authToken')
                     localStorage.removeItem('user')

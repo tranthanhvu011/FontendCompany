@@ -13,6 +13,8 @@ export interface AuthContextType {
     logout: () => void
     isAuthenticated: boolean
     checkUsername: (username: string) => Promise<boolean>
+    checkEmail: (email: string) => Promise<boolean>
+    sendOtp: (email: string) => Promise<void>
 }
 
 export interface ApiResponse<T> {

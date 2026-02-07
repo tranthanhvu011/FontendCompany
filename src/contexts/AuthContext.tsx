@@ -32,7 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const response = await authService.checkUsername(username)
         return response.data  // boolean: true = đã tồn tại, false = chưa có
     }
-
+    const checkEmail = async (email: string): Promise<boolean> => {
+        const response = await authService.checkEmail(email)
+        return response.data
+    }
+    const sendOtp = async (email: string) => {
+        await authService.sendOtp(email)
+    }
 
     const value: AuthContextType = {
         user,
@@ -41,8 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         isAuthenticated: !!user,
         checkUsername,
+        checkEmail,
+        sendOtp,
     }
-
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
