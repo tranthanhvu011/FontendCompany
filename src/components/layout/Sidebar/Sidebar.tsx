@@ -1,10 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 import { useUI } from "@/contexts/UIContext";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from './Sidebar.module.css'
 
 export const Sidebar = () => {
   const { openLogin, isSidebarOpen } = useUI();
+  const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
+
+  const displayName = user?.firstName && user?.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user?.email
 
   const menuItems = [
     { to: "/", icon: "fa-solid fa-house", label: "Home" },
@@ -58,19 +64,45 @@ export const Sidebar = () => {
           </Link>
         ))}
       </nav>
-      <div className="sidebar-auth">
-        <button
-          onClick={openLogin}
-          className="btn btn-primary"
-          style={{ width: "100%" }}
-        >
-          Join Now
-        </button>
-        <div className="text-center mt-2" style={{ marginTop: 10 }}>
-          <span className="text-sm text-muted">Already a member?</span>
-          <button type="button" className={styles.btnLogin} onClick={openLogin}>Đăng Nhập</button>
+
+      {isAuthenticated && user ? (
+        /* === ĐĂNG NHẬP RỒI === */
+        <div className={styles.userProfile}>
+          {user.avatar ? (
+            <img src={user.avatar} alt="avatar" className={styles.sidebarAvatar} />
+          ) : (
+            <div className={styles.sidebarAvatarFallback}>
+              <i className="fa-solid fa-user" />
+            </div>
+          )}
+          <div className={styles.userInfo}>
+            <span className={styles.userDisplayName}>{displayName}</span>
+            <span className={styles.userEmail}>{user.username}</span>
+          </div>
+          <button
+            className={styles.logoutBtn}
+            onClick={logout}
+            title="Logout"
+          >
+            <i className="fa-solid fa-right-from-bracket" />
+          </button>
         </div>
-      </div>
+      ) : (
+        /* === CHƯA ĐĂNG NHẬP === */
+        <div className="sidebar-auth">
+          <button
+            onClick={openLogin}
+            className="btn btn-primary"
+            style={{ width: "100%" }}
+          >
+            Join Now
+          </button>
+          <div className="text-center mt-2" style={{ marginTop: 10 }}>
+            <span className="text-sm text-muted">Already a member?</span>
+            <button type="button" className={styles.btnLogin} onClick={openLogin}>Đăng Nhập</button>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

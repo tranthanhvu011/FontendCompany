@@ -1,10 +1,11 @@
-import type { ApiResponse, RegisterData, RegisterRequest, User } from '@/types'
+import type { ApiResponse, AuthResponse, RegisterRequest, ResetPasswordRequest, User, LoginRequest } from '@/types'
 import { apiClient } from './apiClient';
-import type { LoginRequest, MessageResponse } from '@/types';
+
 export const authService = {
 
     logout(): void {
-        localStorage.removeItem('authToken')
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
         localStorage.removeItem('user')
     },
 
@@ -21,7 +22,7 @@ export const authService = {
     },
 
     isAuthenticated(): boolean {
-        return !!localStorage.getItem('authToken')
+        return !!localStorage.getItem('accessToken')
     },
     checkUsername: (username: string) =>
         apiClient.get<ApiResponse<boolean>>(`/v1/auth/check-username?username=${username}`, { _silent: true }),
@@ -32,5 +33,9 @@ export const authService = {
     register: (data: RegisterRequest) =>
         apiClient.post<ApiResponse<{ success: boolean; message: string }>>(`/v1/auth/register`, data),
     login: (data: LoginRequest) =>
-        apiClient.post<ApiResponse<MessageResponse>>(`/v1/auth/login`, data)
+        apiClient.post<ApiResponse<AuthResponse>>(`/v1/auth/login`, data),
+    forgotPassword: (email: string) =>
+        apiClient.post<ApiResponse<void>>(`/v1/auth/forgot-password?email=${encodeURIComponent(email)}`),
+    resetPassword: (data: ResetPasswordRequest) =>
+        apiClient.post<ApiResponse<void>>(`/v1/auth/reset-password`, data),
 }

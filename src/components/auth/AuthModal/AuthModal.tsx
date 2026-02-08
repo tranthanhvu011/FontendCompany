@@ -1,24 +1,38 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUI } from '@/contexts/UIContext'
 import { FiX } from 'react-icons/fi'
 import { LoginForm } from './LoginForm'
 import { RegisterForm } from './RegisterForm'
 import { ForgotForm } from './ForgotForm'
+import { ResetPasswordForm } from './ResetPasswordForm'
 import styles from './AuthModal.module.css'
 
-type AuthView = 'login' | 'register' | 'forgot'
+type AuthView = 'login' | 'register' | 'forgot' | 'resetPassword'
 
 export const AuthModal = () => {
-    const { isLoginOpen, closeLogin } = useUI()
+    const { isLoginOpen, closeLogin, openLogin } = useUI()
     const [view, setView] = useState<AuthView>('login')
+    const [searchParams, setSearchParams] = useSearchParams()
+    const resetToken = searchParams.get('token')
 
-    // Reset view khi đóng modal
+    // Auto-open modal khi có token trong URL (từ email reset link)
+    useEffect(() => {
+        if (resetToken) {
+            setView('resetPassword')
+            openLogin()
+        }
+    }, [resetToken])
+
     useEffect(() => {
         if (!isLoginOpen) {
-            setTimeout(() => setView('login'), 300)
+            setTimeout(() => {
+                // Chỉ reset view nếu không có token
+                if (!resetToken) setView('login')
+            }, 300)
         }
-    }, [isLoginOpen])
+    }, [isLoginOpen, resetToken])
 
     // Prevent body scroll
     useEffect(() => {
@@ -26,7 +40,14 @@ export const AuthModal = () => {
         return () => { document.body.style.overflow = '' }
     }, [isLoginOpen])
 
-    const handleClose = () => closeLogin()
+    const handleClose = () => {
+        // Xóa token khỏi URL khi đóng modal
+        if (resetToken) {
+            searchParams.delete('token')
+            setSearchParams(searchParams, { replace: true })
+        }
+        closeLogin()
+    }
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) handleClose()
     }
@@ -89,6 +110,12 @@ export const AuthModal = () => {
                             {view === 'forgot' && (
                                 <motion.div key="forgot" variants={contentVariants} initial="hidden" animate="visible" exit="exit" className={styles.content}>
                                     <ForgotForm onSwitchView={setView} />
+                                </motion.div>
+                            )}
+
+                            {view === 'resetPassword' && resetToken && (
+                                <motion.div key="resetPassword" variants={contentVariants} initial="hidden" animate="visible" exit="exit" className={styles.content}>
+                                    <ResetPasswordForm token={resetToken} onSwitchView={setView} />
                                 </motion.div>
                             )}
                         </AnimatePresence>

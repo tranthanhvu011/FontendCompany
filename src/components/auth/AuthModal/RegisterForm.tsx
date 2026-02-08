@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiEye, FiEyeOff, FiMail, FiSend } from 'react-icons/fi'
 import { registerSchema, type RegisterFormData } from '@/utils/validations'
 import { useAuth } from '@/contexts/AuthContext'
-import { authService } from '@/services/authService'
 import { useOtpCooldown } from '@/hooks/useOtpCooldown'
 import styles from './AuthModal.module.css'
 
@@ -19,7 +18,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
     const [showOtpSection, setShowOtpSection] = useState(false)
     const [usernameValid, setUsernameValid] = useState(false)
     const [emailValid, setEmailValid] = useState(false)
-    const { checkUsername, checkEmail, sendOtp } = useAuth()
+    const { checkUsername, checkEmail, sendOtp, register: registerUser } = useAuth()
     const { otpCooldown, isOtpSending, otpSent, sendOtpToEmail, initializeCooldown } = useOtpCooldown()
 
     // Debounce refs
@@ -33,7 +32,6 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
         resolver: zodResolver(registerSchema),
         mode: 'onChange',
     })
-
     const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
     // Watch email để show/hide OTP section
@@ -111,12 +109,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
             return
         }
         try {
-            await authService.register({
-                username: data.username,
-                email: data.email,
-                password: data.password,
-                otp: data.otp,
-            })
+            await registerUser(data.username, data.email, data.otp, data.password)
             onClose()
         } catch {
             // interceptor hiện toast error

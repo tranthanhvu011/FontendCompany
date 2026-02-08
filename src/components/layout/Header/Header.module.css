@@ -130,3 +130,134 @@
     color: white;
     border-color: var(--primary);
 }
+
+/* === User Menu (đã đăng nhập) === */
+.userMenu {
+    position: relative;
+}
+
+.userMenuBtn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.userMenuBtn:hover {
+    background: var(--nav-btn-bg);
+    border-color: var(--border-color);
+}
+
+.userAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
+.userAvatarFallback {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+}
+
+.userName {
+    font-weight: 600;
+    font-size: 0.875rem;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    min-width: 220px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 200;
+    animation: dropdownIn 0.15s ease;
+    overflow: hidden;
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownHeader {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dropdownName {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--text-color);
+}
+
+.dropdownEmail {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dropdownDivider {
+    height: 1px;
+    background: var(--border-color);
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--text-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    font-family: inherit;
+    text-align: left;
+}
+
+.dropdownItem:hover {
+    background: var(--nav-btn-bg);
+    color: var(--primary);
+}
+
+.dropdownLogout:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+}

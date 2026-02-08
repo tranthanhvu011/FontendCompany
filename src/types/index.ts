@@ -1,9 +1,24 @@
 export interface User {
-    id: string
+    userId: string
+    username: string
     email: string
-    name: string
+    firstName?: string
+    lastName?: string
     avatar?: string
-    role?: string
+    roles?: string
+}
+
+// Khớp với backend AuthResponse
+export interface AuthResponse {
+    accessToken: string
+    refreshToken: string
+    userId: string
+    email: string
+    username: string
+    firstName: string
+    lastName: string
+    roles: string
+    avatar: string
 }
 
 export interface AuthContextType {
@@ -15,6 +30,9 @@ export interface AuthContextType {
     checkUsername: (username: string) => Promise<boolean>
     checkEmail: (email: string) => Promise<boolean>
     sendOtp: (email: string) => Promise<void>
+    register: (username: string, email: string, otp: string, password: string) => Promise<void>
+    forgotPassword: (email: string) => Promise<void>
+    resetPassword: (token: string, newPassword: string, confirmPassword: string) => Promise<void>
 }
 
 export interface ApiResponse<T> {
@@ -27,19 +45,16 @@ export interface LoginRequest {
     email: string
     password: string
 }
-export interface RegisterData {
-    name: string
-    email: string
-    password: string
-}
+
 export interface RegisterRequest {
     username: string
     email: string
     password: string
     otp: string
 }
-export interface MessageResponse {
-    success: boolean
-    message: string
-    data?: Record<string, any>
+
+export interface ResetPasswordRequest {
+    token: string
+    newPassword: string
+    confirmPassword: string
 }

@@ -240,7 +240,12 @@
         left: -280px;
         top: 0;
         bottom: 0;
+        width: 280px;
         transition: 0.3s;
+    }
+
+    .hide-on-mobile {
+        display: none !important;
     }
 
     .sidebar.active {

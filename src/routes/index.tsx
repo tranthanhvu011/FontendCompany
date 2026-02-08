@@ -21,6 +21,8 @@ export const AppRoutes = () => {
                     {/* Public Routes */}
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/login" element={<Login />} />
+                    {/* Reset password — AuthModal tự mở khi có ?token= */}
+                    <Route path="/reset-password" element={<Dashboard />} />
 
                     {/* Protected Routes */}
                     <Route
@@ -49,7 +51,7 @@ export const AppRoutes = () => {
                     <Route
                         path="/product/:id"
                         element={
-                                <ProductDetail />
+                            <ProductDetail />
                         }
                     />
 
