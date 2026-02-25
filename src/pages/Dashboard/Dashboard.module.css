@@ -218,3 +218,58 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+
+/* Product card additions */
+.sellerRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sellerAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.cardRating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 22px;
+}
+
+.soldCount {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-darker, #f3f4f6);
+  padding: 2px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sellerName {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.priceTag {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}

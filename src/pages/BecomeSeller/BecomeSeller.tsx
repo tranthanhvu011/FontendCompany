@@ -1,6 +1,7 @@
 import styles from './BecomeSeller.module.css'
 import { motion } from 'framer-motion'
 import { FiUserPlus, FiUpload, FiDollarSign, FiTrendingUp, FiCheck, FiArrowRight } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
 
 const steps = [
     {
@@ -54,9 +55,9 @@ export const BecomeSeller = () => {
                     <h1>Launch your online store effortlessly with Pixer and start selling today.</h1>
                     <p>Transform your creativity into income. Join thousands of creators earning with our global marketplace for digital assets.</p>
                     <div className={styles.heroActions}>
-                        <button className={styles.primaryBtn}>
-                            <FiUserPlus /> Sign Up Now
-                        </button>
+                        <Link to="/seller/register" className={styles.primaryBtn}>
+                            <FiUserPlus /> Đăng ký ngay
+                        </Link>
                         <button className={styles.secondaryBtn}>
                             Visit Help Center <FiArrowRight />
                         </button>
@@ -132,9 +133,9 @@ export const BecomeSeller = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button className={styles.primaryBtn}>
-                            Get Started Free <FiArrowRight />
-                        </button>
+                        <Link to="/seller/register" className={styles.primaryBtn}>
+                            Bắt đầu miễn phí <FiArrowRight />
+                        </Link>
                     </motion.div>
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
@@ -160,9 +161,9 @@ export const BecomeSeller = () => {
                 >
                     <h2>Ready to start your journey?</h2>
                     <p>Join thousands of successful sellers on Pixer today.</p>
-                    <button className={styles.ctaBtn}>
-                        Create Your Store <FiArrowRight />
-                    </button>
+                    <Link to="/seller/register" className={styles.ctaBtn}>
+                        Tạo cửa hàng ngay <FiArrowRight />
+                    </Link>
                 </motion.div>
             </section>
         </div>

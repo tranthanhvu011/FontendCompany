@@ -120,9 +120,7 @@
 .product-grid {
     display: grid;
     gap: 18px;
-    /* giáº£m tá»« 30 */
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    /* 260 -> 210 */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     padding: 20px 24px;
 }
 
@@ -132,6 +130,7 @@
     border: 1px solid var(--border-color);
     overflow: hidden;
     transition: var(--transition);
+    max-width: 380px;
 }
 
 .product-card:hover {
@@ -179,6 +178,32 @@
 
 .product-card:hover .product-card-overlay {
     opacity: 1;
+}
+
+/* Mobile: compact bottom bar thay vì overlay toàn ảnh */
+@media (max-width: 768px) {
+    .product-card-overlay {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overlay-actions {
+        gap: 20px;
+    }
+
+    .overlay-icon {
+        width: 34px;
+        height: 34px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .overlay-action span {
+        font-size: 10px;
+        opacity: 0.9;
+    }
 }
 
 .overlay-actions {

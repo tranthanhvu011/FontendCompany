@@ -1,11 +1,7 @@
 import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { toast } from '@/utils/toastManager'
-
-// Custom config với option silent để tắt toast
-export interface SilentAxiosRequestConfig extends AxiosRequestConfig {
-    _silent?: boolean
-}
+import i18n from '@/i18n'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -35,8 +31,32 @@ class ApiClient {
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('username')
         localStorage.removeItem('user')
-        toast.error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại')
+        toast.error(i18n.t('errors.session_expired', { ns: 'common' }))
         window.location.href = '/'
+    }
+
+    // Translate backend error messages using i18n
+    private translateErrorMessage(msg: string): string {
+        if (!msg) return i18n.t('errors.generic', { ns: 'common' })
+
+        const errorMap: Record<string, string> = {
+            'an unexpected error occurred. please try again later.': 'errors.server',
+            'an unexpected error occurred': 'errors.server',
+            'access denied': 'errors.access_denied',
+            'unauthorized': 'errors.unauthorized',
+            'forbidden': 'errors.forbidden',
+            'not found': 'errors.not_found',
+            'internal server error': 'errors.server',
+            'bad request': 'errors.bad_request',
+            'service unavailable': 'errors.unavailable',
+            'request timeout': 'errors.timeout',
+            'too many requests': 'errors.too_many',
+            'full authentication is required to access this resource': 'errors.login_required',
+        }
+
+        const lowerMsg = msg.toLowerCase().trim()
+        const i18nKey = errorMap[lowerMsg]
+        return i18nKey ? i18n.t(i18nKey, { ns: 'common' }) : msg
     }
 
     constructor() {
@@ -62,20 +82,11 @@ class ApiClient {
             }
         )
 
-        // Response interceptor - auto toast + auto refresh token
+        // Response interceptor - auto refresh token + error toast
         this.client.interceptors.response.use(
-            response => {
-                const config = response.config as SilentAxiosRequestConfig
-                if (config._silent) return response
-
-                const data = response.data
-                if (data?.message && data?.success === true) {
-                    toast.success(data.message)
-                }
-                return response
-            },
+            response => response,
             async error => {
-                const originalRequest = error.config as SilentAxiosRequestConfig & { _retry?: boolean }
+                const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean }
 
                 // === Auto Refresh Token ===
                 const isAuthRequest = originalRequest.url?.includes('/v1/auth/')
@@ -99,6 +110,7 @@ class ApiClient {
 
                     if (!refreshToken) {
                         console.log('🔄 [Auth] Không có refreshToken — logout')
+                        error._handled = true
                         this.forceLogout()
                         return Promise.reject(error)
                     }
@@ -133,21 +145,23 @@ class ApiClient {
                         originalRequest.headers!.Authorization = `Bearer ${authData.accessToken}`
                         console.log('🔄 [Auth] Retry request gốc:', originalRequest.url)
                         return this.client(originalRequest)
-                    } catch (refreshError) {
+                    } catch (refreshError: any) {
                         console.log('🔄 [Auth] ❌ Refresh thất bại — logout')
                         this.processQueue(refreshError as Error, null)
+                        refreshError._handled = true
                         this.forceLogout()
                         return Promise.reject(refreshError)
                     } finally {
                         this.isRefreshing = false
                     }
                 }
-
-                // === Toast error (cho các lỗi không phải 401 hoặc 401 đã retry) ===
-                if (!originalRequest._silent) {
-                    const message = error.response?.data?.message
+                // === Toast error (cho các lỗi không phải 401, hoặc 401 đã hết cách) ===
+                // forceLogout() đã show toast riêng → đánh dấu _handled để không trùng
+                if (!error._handled) {
+                    const rawMsg = error.response?.data?.message
                         || error.response?.data?.error
-                        || 'Có lỗi xảy ra, vui lòng thử lại'
+                        || ''
+                    const message = this.translateErrorMessage(rawMsg)
                     toast.error(message)
                 }
 
@@ -156,22 +170,22 @@ class ApiClient {
         )
     }
 
-    async get<T>(url: string, config?: SilentAxiosRequestConfig): Promise<T> {
+    async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.get(url, config)
         return response.data
     }
 
-    async post<T>(url: string, data?: any, config?: SilentAxiosRequestConfig): Promise<T> {
+    async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.post(url, data, config)
         return response.data
     }
 
-    async put<T>(url: string, data?: any, config?: SilentAxiosRequestConfig): Promise<T> {
+    async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.put(url, data, config)
         return response.data
     }
 
-    async delete<T>(url: string, config?: SilentAxiosRequestConfig): Promise<T> {
+    async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
         const response: AxiosResponse<T> = await this.client.delete(url, config)
         return response.data
     }

@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button, Card } from '@/components/common'
 import { FiArrowRight, FiZap, FiCode, FiLayers } from 'react-icons/fi'
 import styles from './Home.module.css'
 
 export const Home = () => {
+    const { t } = useTranslation('common')
     const { isAuthenticated } = useAuth()
 
     return (
@@ -13,30 +15,29 @@ export const Home = () => {
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
                     <h1 className={styles.heroTitle}>
-                        <span className={styles.gradient}>ReactJS Vite</span>
+                        <span className={styles.gradient}>{t('home.hero_title_1')}</span>
                         <br />
-                        Professional Base Template
+                        {t('home.hero_title_2')}
                     </h1>
                     <p className={styles.heroDescription}>
-                        A modern, production-ready starter template with authentication, routing, and best
-                        practices built-in. Start building your app immediately!
+                        {t('home.hero_desc')}
                     </p>
                     <div className={styles.heroActions}>
                         {isAuthenticated ? (
                             <Link to="/dashboard">
                                 <Button size="lg">
-                                    Go to Dashboard <FiArrowRight />
+                                    {t('home.go_dashboard')} <FiArrowRight />
                                 </Button>
                             </Link>
                         ) : (
                             <Link to="/login">
                                 <Button size="lg">
-                                    Get Started <FiArrowRight />
+                                    {t('home.get_started')} <FiArrowRight />
                                 </Button>
                             </Link>
                         )}
                         <Button variant="secondary" size="lg">
-                            Learn More
+                            {t('home.learn_more')}
                         </Button>
                     </div>
                 </div>
@@ -44,15 +45,15 @@ export const Home = () => {
 
             {/* Features Section */}
             <section className={styles.features}>
-                <h2 className={styles.sectionTitle}>Features</h2>
+                <h2 className={styles.sectionTitle}>{t('home.features')}</h2>
                 <div className={styles.featureGrid}>
                     <Card hover>
                         <div className={styles.feature}>
                             <div className={styles.featureIcon}>
                                 <FiZap />
                             </div>
-                            <h3>Lightning Fast</h3>
-                            <p>Powered by Vite for instant HMR and optimized builds</p>
+                            <h3>{t('home.lightning_fast')}</h3>
+                            <p>{t('home.lightning_desc')}</p>
                         </div>
                     </Card>
 
@@ -61,8 +62,8 @@ export const Home = () => {
                             <div className={styles.featureIcon}>
                                 <FiCode />
                             </div>
-                            <h3>TypeScript Ready</h3>
-                            <p>Full TypeScript support with type safety out of the box</p>
+                            <h3>{t('home.typescript')}</h3>
+                            <p>{t('home.typescript_desc')}</p>
                         </div>
                     </Card>
 
@@ -71,8 +72,8 @@ export const Home = () => {
                             <div className={styles.featureIcon}>
                                 <FiLayers />
                             </div>
-                            <h3>Well Structured</h3>
-                            <p>Professional folder structure following industry standards</p>
+                            <h3>{t('home.structured')}</h3>
+                            <p>{t('home.structured_desc')}</p>
                         </div>
                     </Card>
                 </div>
@@ -82,12 +83,12 @@ export const Home = () => {
             <section className={styles.cta}>
                 <Card>
                     <div className={styles.ctaContent}>
-                        <h2>Ready to build something amazing?</h2>
-                        <p>Start your project with our production-ready template today.</p>
+                        <h2>{t('home.cta_title')}</h2>
+                        <p>{t('home.cta_desc')}</p>
                         {!isAuthenticated && (
                             <Link to="/login">
                                 <Button size="lg">
-                                    Get Started Now <FiArrowRight />
+                                    {t('home.get_started_now')} <FiArrowRight />
                                 </Button>
                             </Link>
                         )}

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { resetPasswordSchema, type ResetPasswordFormData } from '@/utils/validations'
 import { authService } from '@/services/authService'
-import { FiEye, FiEyeOff } from 'react-icons/fi'
+import { FiEye, FiEyeOff, FiCheckCircle } from 'react-icons/fi'
 import styles from './AuthModal.module.css'
 
 interface ResetPasswordFormProps {
@@ -47,7 +47,7 @@ export const ResetPasswordForm = ({ token, onSwitchView }: ResetPasswordFormProp
     if (success) {
         return (
             <>
-                <h2>✅ Password Reset Successfully</h2>
+                <h2><FiCheckCircle style={{ display: 'inline', verticalAlign: 'middle', marginRight: '8px' }} /> Password Reset Successfully</h2>
                 <p className={styles.subtitle}>
                     Your password has been changed. You can now log in with your new password.
                 </p>

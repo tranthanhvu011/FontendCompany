@@ -261,3 +261,34 @@
     color: #ef4444;
     background: rgba(239, 68, 68, 0.08);
 }
+
+/* === Mobile Responsive === */
+@media (max-width: 768px) {
+    .headerWrapper {
+        padding: 12px 16px;
+    }
+
+    .themeToggle {
+        display: none;
+    }
+
+    .btnJoin {
+        display: none;
+    }
+
+    .searchContainer {
+        max-width: 100%;
+    }
+
+    .searchShortcut {
+        display: none;
+    }
+
+    .actionButtons {
+        gap: 8px;
+    }
+
+    .messageToggle {
+        display: none;
+    }
+}

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiEye, FiEyeOff, FiMail, FiSend } from 'react-icons/fi'
+import { FiEye, FiEyeOff, FiMail, FiSend, FiCheck } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
 import { registerSchema, type RegisterFormData } from '@/utils/validations'
 import { useAuth } from '@/contexts/AuthContext'
 import { useOtpCooldown } from '@/hooks/useOtpCooldown'
@@ -14,6 +15,7 @@ interface RegisterFormProps {
 }
 
 export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
+    const { t } = useTranslation('auth')
     const [showPassword, setShowPassword] = useState(false)
     const [showOtpSection, setShowOtpSection] = useState(false)
     const [usernameValid, setUsernameValid] = useState(false)
@@ -56,14 +58,14 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                     const exists = await checkUsername(username)
                     if (exists) {
                         setUsernameValid(false)
-                        setError('username', { message: 'Username đã tồn tại' })
+                        setError('username', { message: t('register.username_exists') })
                     } else {
                         setUsernameValid(true)
                         clearErrors('username')
                     }
                 } catch {
                     setUsernameValid(false)
-                    setError('username', { message: 'Không thể kiểm tra username' })
+                    setError('username', { message: t('register.username_check_error') })
                 }
             }, 500)
         } else {
@@ -80,14 +82,14 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                     const exists = await checkEmail(email)
                     if (exists) {
                         setEmailValid(false)
-                        setError('email', { message: 'Email đã tồn tại' })
+                        setError('email', { message: t('register.email_exists') })
                     } else {
                         setEmailValid(true)
                         clearErrors('email')
                     }
                 } catch {
                     setEmailValid(false)
-                    setError('email', { message: 'Không thể kiểm tra email' })
+                    setError('email', { message: t('register.email_check_error') })
                 }
             }, 500)
         } else {
@@ -105,7 +107,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
     // ========== Submit ==========
     const onSubmit = async (data: RegisterFormData) => {
         if (!otpSent) {
-            setError('otp', { message: 'Vui lòng gửi mã OTP trước' })
+            setError('otp', { message: t('register.otp_required') })
             return
         }
         try {
@@ -118,32 +120,32 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
 
     return (
         <>
-            <h2>Welcome Back, Get Login</h2>
+            <h2>{t('register.title')}</h2>
             <p className={styles.subtitle}>
-                Create your account. Already have account?{' '}
+                {t('register.has_account', { defaultValue: 'Already have account?' })}{' '}
                 <button type="button" className={styles.linkBtn} onClick={() => onSwitchView('login')}>
-                    Login here
+                    {t('register.login_here')}
                 </button>
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Username */}
                 <div className={styles.formGroup}>
-                    <label>Username</label>
+                    <label>{t('register.username')}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             type="text"
-                            placeholder="Nhập username"
+                            placeholder={t('register.username_placeholder')}
                             {...register('username', {
                                 onChange: (e) => handleUsernameCheck(e.target.value),
                             })}
                         />
                         {usernameValid && (
-                            <span className={styles.inputSuccess}>✓</span>
+                            <span className={styles.inputSuccess}><FiCheck /></span>
                         )}
                     </div>
                     {usernameValid && !errors.username && (
-                        <p className={styles.successText}>Username hợp lệ ✓</p>
+                        <p className={styles.successText}>{t('register.username_valid')} <FiCheck style={{ display: 'inline', verticalAlign: 'middle' }} /></p>
                     )}
                     {errors.username && (
                         <p className={styles.errorText}>{errors.username.message}</p>
@@ -152,7 +154,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
 
                 {/* Email */}
                 <div className={styles.formGroup}>
-                    <label>Email</label>
+                    <label>{t('register.email')}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             type="email"
@@ -162,12 +164,12 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                             })}
                         />
                         {emailValid && (
-                            <span className={styles.inputSuccess}>✓</span>
+                            <span className={styles.inputSuccess}><FiCheck /></span>
                         )}
                         <FiMail className={styles.inputIcon} />
                     </div>
                     {emailValid && !errors.email && (
-                        <p className={styles.successText}>Email hợp lệ ✓</p>
+                        <p className={styles.successText}>{t('register.email_valid')} <FiCheck style={{ display: 'inline', verticalAlign: 'middle' }} /></p>
                     )}
                     {errors.email && (
                         <p className={styles.errorText}>{errors.email.message}</p>
@@ -185,12 +187,12 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                             className={styles.otpSection}
                         >
                             <div className={styles.formGroup}>
-                                <label>Mã OTP</label>
+                                <label>{t('register.otp_label')}</label>
                                 <div className={styles.otpRow}>
                                     <div className={styles.inputWrapper}>
                                         <input
                                             type="text"
-                                            placeholder="Nhập mã 6 số"
+                                            placeholder={t('register.otp_placeholder')}
                                             maxLength={6}
                                             className={styles.otpInput}
                                             {...register('otp', {
@@ -217,7 +219,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                                         ) : (
                                             <>
                                                 <FiSend />
-                                                <span>Gửi mã</span>
+                                                <span>{t('register.send_otp')}</span>
                                             </>
                                         )}
                                     </button>
@@ -226,10 +228,10 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                                     <p className={styles.errorText}>{errors.otp.message}</p>
                                 )}
                                 {otpSent && otpCooldown === 0 && (
-                                    <p className={styles.otpHint}>Bạn có thể gửi lại mã OTP</p>
+                                    <p className={styles.otpHint}>{t('register.otp_resend')}</p>
                                 )}
                                 {otpCooldown > 0 && (
-                                    <p className={styles.otpHint}>Mã OTP đã được gửi đến email của bạn</p>
+                                    <p className={styles.otpHint}>{t('register.otp_sent')}</p>
                                 )}
                             </div>
                         </motion.div>
@@ -238,7 +240,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
 
                 {/* Password */}
                 <div className={styles.formGroup}>
-                    <label>Password</label>
+                    <label>{t('register.password')}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             type={showPassword ? 'text' : 'password'}
@@ -259,7 +261,7 @@ export const RegisterForm = ({ onClose, onSwitchView }: RegisterFormProps) => {
                 </div>
 
                 <button type="submit" className={styles.submitBtn}>
-                    Register
+                    {t('register.submit')}
                 </button>
             </form>
         </>

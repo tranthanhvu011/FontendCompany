@@ -22,7 +22,7 @@ export const Login = () => {
             await login(email, password)
             navigate('/dashboard')
         } catch (err: any) {
-            setError(err.message || 'Login failed')
+            setError(err.message || 'Đăng nhập thất bại, vui lòng thử lại')
         } finally {
             setLoading(false)
         }

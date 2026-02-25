@@ -1,53 +1,95 @@
-﻿import { useCart } from '@/contexts/CartContext'
-import styles from './Dashboard.module.css'
-import { useState, useRef, useEffect } from 'react'
+﻿import styles from './Dashboard.module.css'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { FiChevronLeft, FiChevronRight, FiSearch, FiExternalLink } from 'react-icons/fi'
-import { motion, AnimatePresence } from 'framer-motion'
+
 import { ProductDetailModal } from '@/components/product'
+import { StarRating } from '@/components/common'
+import { formatVND } from '@/data/productData'
+import { productApi } from '@/services/productService'
+import type { CategoryResponse, ProductCardResponse, ProductDetailResponse } from '@/services/productService'
+import { resolveImgUrl } from '@/utils/imageUrl'
 
 export const Dashboard = () => {
-  const { addItem } = useCart()
+  const { t } = useTranslation('common')
   const navigate = useNavigate()
   const scrollRef = useRef<HTMLDivElement>(null)
   const [showLeftButton, setShowLeftButton] = useState(false)
   const [showRightButton, setShowRightButton] = useState(false)
-  const [activeCategory, setActiveCategory] = useState('All')
+
+  // Data states
+  const [categories, setCategories] = useState<CategoryResponse[]>([])
+  const [products, setProducts] = useState<ProductCardResponse[]>([])
+  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
 
   // Modal state
-  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [selectedProduct, setSelectedProduct] = useState<ProductDetailResponse | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
 
-  const openProductDetail = (product: any) => {
-    setSelectedProduct(product)
+  // Fetch categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await productApi.getCategories()
+        setCategories(data)
+      } catch (err) {
+        console.error('Failed to load categories:', err)
+      }
+    }
+    loadCategories()
+  }, [])
+
+  // Fetch products when category or page changes
+  const loadProducts = useCallback(async (categoryId: number | null, pageNum: number, append = false) => {
+    setLoading(true)
+    try {
+      const data = await productApi.getProducts({
+        categoryId,
+        page: pageNum,
+        size: 12,
+      })
+      setProducts(prev => append ? [...prev, ...data.content] : data.content)
+      setHasMore(!data.last)
+      setPage(pageNum)
+    } catch (err) {
+      console.error('Failed to load products:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadProducts(activeCategoryId, 0)
+  }, [activeCategoryId, loadProducts])
+
+  // Open product detail modal
+  const openProductDetail = async (slug: string) => {
+    setModalLoading(true)
     setIsModalOpen(true)
+    try {
+      const detail = await productApi.getProductBySlug(slug)
+      setSelectedProduct(detail)
+    } catch (err) {
+      console.error('Failed to load product detail:', err)
+      setIsModalOpen(false)
+    } finally {
+      setModalLoading(false)
+    }
   }
 
-  // Danh sách categories
-  const categories = [
-    'All',
-    'Free',
-    'PHP Script',
-    'HTML',
-    'React',
-    'WordPress Plugin',
-    'WordPress Theme',
-    'Angular',
-    'CMS',
-    'Wireframe Kits',
-    'UI templates',
-    'Illustrations',
-    'Icon Sets',
-    'Mobile App',
-    '3D Assets',
-    'Bootstrap',
-    'Vue.js',
-    'Laravel',
-    'Next.js',
-    'Tailwind CSS'
-  ]
+  // Load more products
+  const handleLoadMore = () => {
+    if (hasMore && !loading) {
+      loadProducts(activeCategoryId, page + 1, true)
+    }
+  }
 
-  // Hàm cập nhật hiển thị nút scroll
+  // Scroll logic
   const updateScrollButtons = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
@@ -56,93 +98,25 @@ export const Dashboard = () => {
     }
   }
 
-  // Scroll sang trái
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft -= 300
-    }
+  const scrollLeftFn = () => {
+    if (scrollRef.current) scrollRef.current.scrollLeft -= 300
   }
 
-  // Scroll sang phải
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft += 300
-    }
+  const scrollRightFn = () => {
+    if (scrollRef.current) scrollRef.current.scrollLeft += 300
   }
 
   useEffect(() => {
     updateScrollButtons()
     window.addEventListener('resize', updateScrollButtons)
     return () => window.removeEventListener('resize', updateScrollButtons)
-  }, [])
+  }, [categories])
 
-  const products = [
-    {
-      id: 'p1',
-      title: 'Temprador WooCommerce',
-      price: 59.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F1%2F1-Product-thumb.jpg&w=1920&q=75',
-      author: 'Imagineco',
-      category: 'WooCommerce',
-      isNew: true
-    },
-    {
-      id: 'p2',
-      title: 'Shoppie UI Kit PSD',
-      price: 7.99,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F2%2F2-Product-thumb.jpg&w=1920&q=75',
-      author: 'Qubitron Solutions',
-      category: 'UI Kit'
-    },
-    {
-      id: 'p3',
-      title: 'Bookify Rental Script',
-      price: 43.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F3%2F3-Product-thumb.jpg&w=1920&q=75',
-      author: 'Maxicon Soft Tech',
-      category: 'Script'
-    },
-    {
-      id: 'p4',
-      title: 'NFT Marketplace React',
-      price: 89.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F4%2F4-Product-thumb.jpg&w=1920&q=75',
-      author: 'FutureCode',
-      category: 'React'
-    },
-    {
-      id: 'p5',
-      title: 'Fitness App Flutter',
-      price: 49.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F5%2F5-Product-thumb.jpg&w=1920&q=75',
-      author: 'MobilePro',
-      category: 'Mobile'
-    },
-    {
-      id: 'p6',
-      title: 'LMS Portfolio Theme',
-      price: 29.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F6%2F6-Product-thumb.jpg&w=1920&q=75',
-      author: 'EduTheme',
-      category: 'WordPress'
-    },
-    {
-      id: 'p7',
-      title: 'Modern Coffee Shop',
-      price: 19.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F7%2F7-Product-thumb.jpg&w=1920&q=75',
-      author: 'FreshDesign',
-      category: 'HTML'
-    },
-    {
-      id: 'p8',
-      title: 'Saas Dashboard Kit',
-      price: 35.0,
-      image: 'https://pixer.redq.io/_next/image?url=https%3A%2F%2Fs3.amazonaws.com%2Fredq-pixer%2Fproducts%2F8%2F8-Product-thumb.jpg&w=1920&q=75',
-      author: 'SaaSify',
-      category: 'UI Kit'
-    }
-  ]
+  // Handle category click
+  const handleCategoryClick = (categoryId: number | null) => {
+    setActiveCategoryId(categoryId)
+    setPage(0)
+  }
 
   return (
     <>
@@ -152,27 +126,33 @@ export const Dashboard = () => {
           <div className={styles.navbarContainer}>
             <div className={styles.navbarWrapper}>
               {showLeftButton && (
-                <button className={`${styles.scrollBtn} ${styles.left}`} onClick={scrollLeft}>
+                <button className={`${styles.scrollBtn} ${styles.left}`} onClick={scrollLeftFn}>
                   <FiChevronLeft size={24} />
                 </button>
               )}
 
               <div ref={scrollRef} className={styles.navScrollContainer} onScroll={updateScrollButtons}>
                 <div className={styles.navList}>
-                  {categories.map((category) => (
+                  <button
+                    className={`${styles.navBtn} ${activeCategoryId === null ? styles.active : ''}`}
+                    onClick={() => handleCategoryClick(null)}
+                  >
+                    {t('dashboard.all_categories')}
+                  </button>
+                  {categories.map((cat) => (
                     <button
-                      key={category}
-                      className={`${styles.navBtn} ${activeCategory === category ? styles.active : ''}`}
-                      onClick={() => setActiveCategory(category)}
+                      key={cat.id}
+                      className={`${styles.navBtn} ${activeCategoryId === cat.id ? styles.active : ''}`}
+                      onClick={() => handleCategoryClick(cat.id)}
                     >
-                      {category}
+                      {cat.name}
                     </button>
                   ))}
                 </div>
               </div>
 
               {showRightButton && (
-                <button className={`${styles.scrollBtn} ${styles.right}`} onClick={scrollRight}>
+                <button className={`${styles.scrollBtn} ${styles.right}`} onClick={scrollRightFn}>
                   <FiChevronRight size={24} />
                 </button>
               )}
@@ -182,69 +162,80 @@ export const Dashboard = () => {
 
         {/* Products Grid */}
         <section className="w-full pb-10 px-6">
-          <motion.div layout className="product-grid">
-            <AnimatePresence mode='popLayout'>
-              {products.map((product, index) => (
-                <motion.article
-                  key={product.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="product-card"
-                >
-                  <div className="product-img-wrapper">
-                    <img src={product.image} alt={product.title} loading="lazy" />
-                    {product.isNew && <span className="badge-new">NEW</span>}
-                    <div className="product-card-overlay">
-                      <div className="overlay-actions">
-                        <div className="overlay-action" onClick={() => openProductDetail(product)}>
-                          <div className="overlay-icon"><FiSearch /></div>
-                          <span>Preview</span>
-                        </div>
-                        <div className="overlay-action" onClick={() => navigate(`/product/${product.id}`)}>
-                          <div className="overlay-icon"><FiExternalLink /></div>
-                          <span>Details</span>
-                        </div>
+          <div className="product-grid">
+            {products.map((product) => (
+              <article
+                key={product.id}
+                className="product-card"
+              >
+                <div className="product-img-wrapper">
+                  <img
+                    src={resolveImgUrl(product.primaryImageUrl) || 'https://via.placeholder.com/800x500/1a1a2e/ffffff?text=No+Image'}
+                    alt={product.name}
+                    loading="lazy"
+                  />
+                  {product.totalSold > 1000 && <span className="badge-hot">HOT</span>}
+                  <div className="product-card-overlay">
+                    <div className="overlay-actions">
+                      <div className="overlay-action" onClick={() => openProductDetail(product.slug)}>
+                        <div className="overlay-icon"><FiSearch /></div>
+                        <span>{t('dashboard.quick_view')}</span>
+                      </div>
+                      <div className="overlay-action" onClick={() => navigate(`/product/${product.slug}`)}>
+                        <div className="overlay-icon"><FiExternalLink /></div>
+                        <span>{t('dashboard.view_detail')}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="product-info">
-                    <span className="product-title cursor-pointer" onClick={() => navigate(`/product/${product.id}`)}>
-                      {product.title}
-                    </span>
-                    <div className="product-category">{product.category}</div>
-                    <div className="product-meta">
-                      <div className="author flex items-center gap-2 text-sm text-light">
-                        <div className="avatar"></div>
-                        <span>{product.author.substring(0, 5)}</span>
-                      </div>
-                      <button
-                        className="add-to-cart-btn btn-sm btn-outline text-primary"
-                        onClick={() => addItem(product)}
-                      >
-                        ${product.price.toFixed(2)}
-                      </button>
+                </div>
+                <div className="product-info">
+                  <span className="product-title cursor-pointer" onClick={() => navigate(`/product/${product.slug}`)}>
+                    {product.name}
+                  </span>
+                  <div className="product-category">{product.categoryName}</div>
+                  <div className={styles.cardRating}>
+                    <StarRating rating={product.ratingAvg} count={product.ratingCount} size="sm" />
+                    <span className={styles.soldCount}>{product.totalSold} {t('dashboard.sold')}</span>
+                  </div>
+                  <div className="product-meta">
+                    <div className={styles.sellerRow}>
+                      <img
+                        src={product.sellerAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.sellerName)}&background=10b981&color=fff&size=64`}
+                        alt={product.sellerName}
+                        className={styles.sellerAvatar}
+                      />
+                      <span className={styles.sellerName}>{product.sellerName}</span>
+                    </div>
+                    <div className={styles.priceTag}>
+                      Từ {formatVND(product.minPrice)}
                     </div>
                   </div>
-                </motion.article>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        </section>
+                </div>
+              </article>
+            ))}
+          </div>
 
-        <div className={styles.loadMoreWrapper}>
-          <button className={styles.loadMoreBtn}>Load more</button>
-        </div>
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+              {t('dashboard.loading')}
+            </div>
+          )}
+        </section >
+
+        {hasMore && !loading && (
+          <div className={styles.loadMoreWrapper}>
+            <button className={styles.loadMoreBtn} onClick={handleLoadMore}>{t('dashboard.load_more')}</button>
+          </div>
+        )
+        }
 
         <ProductDetailModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => { setIsModalOpen(false); setSelectedProduct(null) }}
           product={selectedProduct}
-          onAddToCart={(p) => addItem(p)}
+          loading={modalLoading}
         />
-      </div>
+      </div >
     </>
   )
 }

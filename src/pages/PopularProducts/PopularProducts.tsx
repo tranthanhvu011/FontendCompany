@@ -2,7 +2,6 @@ import styles from './PopularProducts.module.css'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useCart } from '@/contexts/CartContext'
 import { FiSearch, FiExternalLink, FiTrendingUp } from 'react-icons/fi'
 import { ProductDetailModal } from '@/components/product'
 
@@ -91,7 +90,6 @@ const products = [
 
 export const PopularProducts = () => {
     const navigate = useNavigate()
-    const { addItem } = useCart()
     const [activeTab, setActiveTab] = useState('all-time')
     const [selectedProduct, setSelectedProduct] = useState<any>(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -177,7 +175,7 @@ export const PopularProducts = () => {
                                     </div>
                                     <button
                                         className="add-to-cart-btn btn-sm btn-outline text-primary"
-                                        onClick={() => addItem(product)}
+                                        onClick={() => navigate(`/product/${product.id}`)}
                                     >
                                         ${product.price.toFixed(2)}
                                     </button>
@@ -196,7 +194,6 @@ export const PopularProducts = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 product={selectedProduct}
-                onAddToCart={(p) => addItem(p)}
             />
         </motion.div>
     )

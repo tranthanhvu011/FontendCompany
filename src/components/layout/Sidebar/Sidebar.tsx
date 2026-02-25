@@ -1,9 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from 'react-i18next'
 import { useUI } from "@/contexts/UIContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { resolveImgUrl } from "@/utils/imageUrl";
+import { FiHome, FiCompass, FiZap, FiUsers, FiMail, FiHelpCircle, FiShoppingBag, FiHexagon, FiUser, FiLogOut } from 'react-icons/fi'
 import styles from './Sidebar.module.css'
 
 export const Sidebar = () => {
+  const { t } = useTranslation('common')
   const { openLogin, isSidebarOpen } = useUI();
   const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
@@ -13,16 +17,16 @@ export const Sidebar = () => {
     : user?.email
 
   const menuItems = [
-    { to: "/", icon: "fa-solid fa-house", label: "Home" },
-    { to: "/explore", icon: "fa-solid fa-compass", label: "Explore" },
-    { to: "/popular-products", icon: "fa-solid fa-bolt", label: "Popular Products" },
-    { to: "/authors", icon: "fa-solid fa-users", label: "Top Authors" },
+    { to: "/", icon: <FiHome />, label: t('sidebar.home') },
+    { to: "/explore", icon: <FiCompass />, label: t('sidebar.explore') },
+    { to: "/popular-products", icon: <FiZap />, label: t('sidebar.popular_products') },
+    { to: "/authors", icon: <FiUsers />, label: t('sidebar.top_authors') },
   ]
 
   const secondaryItems = [
-    { to: "/contact-us", icon: "fa-regular fa-envelope", label: "Contact" },
-    { to: "/help", icon: "fa-regular fa-circle-question", label: "Help" },
-    { to: "/become-seller", icon: "fa-solid fa-store", label: "Become Seller" },
+    { to: "/contact-us", icon: <FiMail />, label: t('sidebar.contact') },
+    { to: "/help", icon: <FiHelpCircle />, label: t('sidebar.help') },
+    { to: "/become-seller", icon: <FiShoppingBag />, label: t('sidebar.become_seller') },
   ]
 
   const isActive = (path: string) => location.pathname === path;
@@ -34,8 +38,8 @@ export const Sidebar = () => {
         className="logo font-bold text-lg flex items-center gap-2 sidebar-logo"
       >
         <div className="logo-icon-wrapper">
-          <i
-            className="fa-solid fa-shapes text-primary"
+          <FiHexagon
+            className="text-primary"
             style={{ fontSize: "1.5rem" }}
           />
         </div>
@@ -48,7 +52,7 @@ export const Sidebar = () => {
             to={item.to}
             className={`menu-item ${isActive(item.to) ? 'active' : ''}`}
           >
-            <i className={item.icon} /> <span>{item.label}</span>
+            {item.icon} <span>{item.label}</span>
           </Link>
         ))}
 
@@ -60,7 +64,7 @@ export const Sidebar = () => {
             to={item.to}
             className={`menu-item ${isActive(item.to) ? 'active' : ''}`}
           >
-            <i className={item.icon} /> <span>{item.label}</span>
+            {item.icon} <span>{item.label}</span>
           </Link>
         ))}
       </nav>
@@ -69,10 +73,10 @@ export const Sidebar = () => {
         /* === ĐĂNG NHẬP RỒI === */
         <div className={styles.userProfile}>
           {user.avatar ? (
-            <img src={user.avatar} alt="avatar" className={styles.sidebarAvatar} />
+            <img src={resolveImgUrl(user.avatar)} alt="avatar" className={styles.sidebarAvatar} />
           ) : (
             <div className={styles.sidebarAvatarFallback}>
-              <i className="fa-solid fa-user" />
+              <FiUser />
             </div>
           )}
           <div className={styles.userInfo}>
@@ -82,9 +86,9 @@ export const Sidebar = () => {
           <button
             className={styles.logoutBtn}
             onClick={logout}
-            title="Logout"
+            title={t('nav.logout')}
           >
-            <i className="fa-solid fa-right-from-bracket" />
+            <FiLogOut />
           </button>
         </div>
       ) : (
@@ -95,11 +99,11 @@ export const Sidebar = () => {
             className="btn btn-primary"
             style={{ width: "100%" }}
           >
-            Join Now
+            {t('sidebar.join_now')}
           </button>
           <div className="text-center mt-2" style={{ marginTop: 10 }}>
-            <span className="text-sm text-muted">Already a member?</span>
-            <button type="button" className={styles.btnLogin} onClick={openLogin}>Đăng Nhập</button>
+            <span className="text-sm text-muted">{t('sidebar.already_member')}</span>
+            <button type="button" className={styles.btnLogin} onClick={openLogin}>{t('sidebar.login')}</button>
           </div>
         </div>
       )}

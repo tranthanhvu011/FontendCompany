@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslation } from 'react-i18next'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import { loginSchema, type LoginFormData } from '@/utils/validations'
 import { useAuth } from '@/contexts/AuthContext'
@@ -12,6 +13,7 @@ interface LoginFormProps {
     onSwitchView: (view: 'register' | 'forgot') => void
 }
 export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
+    const { t } = useTranslation('auth')
     const { login } = useAuth()
     const [showPassword, setShowPassword] = useState(false)
 
@@ -31,17 +33,17 @@ export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
 
     return (
         <>
-            <h2>Welcome Back, Get Login</h2>
+            <h2>{t('login.welcome_back')}</h2>
             <p className={styles.subtitle}>
-                Join your account. Don't have account?{' '}
+                {t('register.has_account', { defaultValue: '' })}{t('login.no_account')}{' '}
                 <button type="button" className={styles.linkBtn} onClick={() => onSwitchView('register')}>
-                    Create Account
+                    {t('login.create_account')}
                 </button>
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className={styles.formGroup}>
-                    <label>Email</label>
+                    <label>{t('login.email')}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             type="email"
@@ -55,7 +57,7 @@ export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
                 </div>
 
                 <div className={styles.formGroup}>
-                    <label>Password</label>
+                    <label>{t('login.password')}</label>
                     <div className={styles.inputWrapper}>
                         <input
                             type={showPassword ? 'text' : 'password'}
@@ -79,15 +81,15 @@ export const LoginForm = ({ onClose, onSwitchView }: LoginFormProps) => {
                     <label className={styles.checkbox}>
                         <input type="checkbox" />
                         <span className={styles.checkmark}></span>
-                        Remember me
+                        {t('login.remember_me')}
                     </label>
                     <button type="button" className={styles.forgotLink} onClick={() => onSwitchView('forgot')}>
-                        Forgot Password?
+                        {t('login.forgot_password')}
                     </button>
                 </div>
 
                 <button type="submit" className={styles.submitBtn}>
-                    Get Login
+                    {t('login.submit')}
                 </button>
             </form>
         </>

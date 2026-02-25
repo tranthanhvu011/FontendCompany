@@ -4,3 +4,7 @@ export { Card } from './Card'
 export { Loading } from './Loading'
 export { Modal } from './Modal/Modal'
 export { ToastItem, ToastContainer } from './Toast'
+export { StarRating } from './StarRating'
+export { ConfirmModal } from './ConfirmModal/ConfirmModal'
+export { LanguageSwitcher } from './LanguageSwitcher/LanguageSwitcher'
+

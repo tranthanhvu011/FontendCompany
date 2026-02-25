@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { FiX } from 'react-icons/fi';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -45,8 +46,8 @@ export const Modal: React.FC<ModalProps> = ({
                 style={{ maxWidth: width }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <button className={styles.closeButton} onClick={onClose}>
-                    <i className="fa-solid fa-xmark"></i>
+                <button className={styles.closeButton} onClick={onClose} aria-label="Close modal">
+                    <FiX />
                 </button>
                 {children}
             </div>

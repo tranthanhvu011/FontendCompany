@@ -88,6 +88,12 @@ body.dark-mode {
   --gray-50: #1e293b;
   --gray-100: #0f172a;
   --gray-900: #f1f5f9;
+
+  /* Shadow overrides for dark mode */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.35);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4);
 }
 
 /* Reset and Base Styles */
@@ -110,12 +116,14 @@ body {
   color: var(--text-color);
   line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* Typography */

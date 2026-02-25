@@ -2,7 +2,6 @@ import styles from './Explore.module.css'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useCart } from '@/contexts/CartContext'
 import { FiSearch, FiExternalLink, FiFilter, FiX } from 'react-icons/fi'
 import { ProductDetailModal } from '@/components/product'
 
@@ -80,7 +79,6 @@ const products = [
 
 export const Explore = () => {
     const navigate = useNavigate()
-    const { addItem } = useCart()
     const [selectedCategory, setSelectedCategory] = useState('All Categories')
     const [selectedPrice, setSelectedPrice] = useState<string | null>(null)
     const [sortBy, setSortBy] = useState('latest')
@@ -246,7 +244,7 @@ export const Explore = () => {
                                         </div>
                                         <button
                                             className="add-to-cart-btn btn-sm btn-outline text-primary"
-                                            onClick={() => addItem(product)}
+                                            onClick={() => navigate(`/product/${product.id}`)}
                                         >
                                             {product.price === 0 ? 'Free' : `$${product.price.toFixed(2)}`}
                                         </button>
@@ -266,7 +264,6 @@ export const Explore = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 product={selectedProduct}
-                onAddToCart={(p) => addItem(p)}
             />
         </motion.div>
     )

@@ -74,6 +74,8 @@
     overflow-x: hidden;
     transition: background-color 0.3s ease;
     width: 100%;
+    min-width: 0;
+    /* Prevent CSS Grid children from overflowing */
 }
 
 /* TOP HEADER */

@@ -1,15 +1,24 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useUI } from '@/contexts/UIContext'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/CartContext'
+import { useChat } from '@/contexts/ChatContext'
+import { resolveImgUrl } from '@/utils/imageUrl'
+import { FiMenu, FiSearch, FiSun, FiMoon, FiShoppingCart, FiUser, FiShoppingBag, FiLogOut, FiMessageCircle } from 'react-icons/fi'
+import { LanguageSwitcher } from '@/components/common'
 import styles from './Header.module.css'
 
 export const Header = () => {
+    const { t } = useTranslation('common')
     const { toggleSidebar, toggleTheme, toggleCart, openLogin, isDarkMode } = useUI()
     const { user, isAuthenticated, logout } = useAuth()
-    const { itemCount } = useCart()
+    const { totalQuantity: itemCount } = useCart()
+    const { totalUnread } = useChat()
     const [showDropdown, setShowDropdown] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
 
     // Tên hiển thị: firstName + lastName → fallback email
     const displayName = user?.firstName && user?.lastName
@@ -35,34 +44,53 @@ export const Header = () => {
     return (
         <header className={styles.headerWrapper}>
             <div className="flex items-center gap-4 w-full">
-                <div className="mobile-toggle cursor-pointer lg:hidden" onClick={toggleSidebar}>
-                    <i className="fa-solid fa-bars text-xl" />
+                <div className="mobile-toggle cursor-pointer lg:hidden" onClick={toggleSidebar} role="button" aria-label="Toggle sidebar">
+                    <FiMenu size={20} />
                 </div>
 
                 {/* Search Bar */}
                 <div className={styles.searchContainer}>
-                    <i className="fa-solid fa-magnifying-glass text-muted" />
+                    <FiSearch className="text-muted" />
                     <input
                         type="text"
                         className={styles.searchInput}
-                        placeholder="Search your products..."
+                        placeholder={t('nav.search_placeholder')}
                     />
                     <div className={styles.searchShortcut}>/</div>
                 </div>
             </div>
 
             <div className={styles.actionButtons}>
+                {/* Language Switcher */}
+                <LanguageSwitcher />
+
                 <button
-                    className={styles.iconButton}
+                    className={`${styles.iconButton} ${styles.themeToggle}`}
                     onClick={toggleTheme}
                     aria-label="Toggle Theme"
                 >
-                    {isDarkMode ? <i className="fa-solid fa-sun" /> : <i className="fa-solid fa-moon" />}
+                    {isDarkMode ? <FiSun /> : <FiMoon />}
                 </button>
 
+                {/* Messages */}
+                {isAuthenticated && (
+                    <button
+                        className={`${styles.iconButton} ${styles.cartToggle} ${styles.messageToggle}`}
+                        onClick={() => navigate('/messages')}
+                        aria-label={t('nav.messages')}
+                    >
+                        <FiMessageCircle />
+                        {totalUnread > 0 && (
+                            <span className={styles.cartBadge}>
+                                {totalUnread > 99 ? '99+' : totalUnread}
+                            </span>
+                        )}
+                    </button>
+                )}
+
                 {/* Cart Toggle */}
-                <button className={`${styles.iconButton} ${styles.cartToggle}`} onClick={toggleCart}>
-                    <i className="fa-solid fa-cart-shopping" />
+                <button className={`${styles.iconButton} ${styles.cartToggle}`} onClick={toggleCart} aria-label="Cart">
+                    <FiShoppingCart />
                     {itemCount > 0 && (
                         <span className={styles.cartBadge}>
                             {itemCount}
@@ -78,10 +106,10 @@ export const Header = () => {
                             onClick={() => setShowDropdown(!showDropdown)}
                         >
                             {user.avatar ? (
-                                <img src={user.avatar} alt="avatar" className={styles.userAvatar} />
+                                <img src={resolveImgUrl(user.avatar)} alt="avatar" className={styles.userAvatar} />
                             ) : (
                                 <div className={styles.userAvatarFallback}>
-                                    <i className="fa-solid fa-user" />
+                                    <FiUser />
                                 </div>
                             )}
                             <span className={`${styles.userName} hide-on-mobile`}>{displayName}</span>
@@ -94,15 +122,15 @@ export const Header = () => {
                                     <span className={styles.dropdownEmail}>{user.email}</span>
                                 </div>
                                 <div className={styles.dropdownDivider} />
-                                <button className={styles.dropdownItem}>
-                                    <i className="fa-solid fa-user" /> Profile
+                                <button className={styles.dropdownItem} onClick={() => { navigate('/profile'); setShowDropdown(false) }}>
+                                    <FiUser /> {t('nav.profile')}
                                 </button>
-                                <button className={styles.dropdownItem}>
-                                    <i className="fa-solid fa-bag-shopping" /> My Orders
+                                <button className={styles.dropdownItem} onClick={() => { navigate('/orders'); setShowDropdown(false) }}>
+                                    <FiShoppingBag /> {t('nav.my_orders')}
                                 </button>
                                 <div className={styles.dropdownDivider} />
                                 <button className={`${styles.dropdownItem} ${styles.dropdownLogout}`} onClick={handleLogout}>
-                                    <i className="fa-solid fa-right-from-bracket" /> Logout
+                                    <FiLogOut /> {t('nav.logout')}
                                 </button>
                             </div>
                         )}
@@ -114,11 +142,11 @@ export const Header = () => {
                             onClick={openLogin}
                             className={`${styles.btnSell} hide-on-mobile`}
                         >
-                            Start Selling
+                            {t('nav.start_selling')}
                         </button>
 
                         <button onClick={openLogin} className={styles.btnJoin}>
-                            Join
+                            {t('nav.join')}
                         </button>
                     </>
                 )}

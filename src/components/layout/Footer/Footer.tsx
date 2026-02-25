@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
-import { FiGithub, FiTwitter, FiLinkedin, FiInstagram } from 'react-icons/fi'
+import { useTranslation } from 'react-i18next'
+import { FiTwitter, FiInstagram, FiGithub, FiLinkedin, FiHexagon, FiHeart } from 'react-icons/fi'
 import styles from './Footer.module.css'
 
 export const Footer = () => {
+    const { t } = useTranslation('common')
     const currentYear = new Date().getFullYear()
 
     return (
@@ -12,12 +14,12 @@ export const Footer = () => {
                     <div className={styles.brand}>
                         <Link to="/" className={styles.logo}>
                             <div className={styles.logoIcon}>
-                                <i className="fa-solid fa-shapes" />
+                                <FiHexagon />
                             </div>
                             <span>Pixer</span>
                         </Link>
                         <p className={styles.brandDesc}>
-                            The best digital marketplace for creative assets, templates, and UI resources.
+                            {t('footer.brand_desc')}
                         </p>
                         <div className={styles.social}>
                             <a href="#" aria-label="Twitter"><FiTwitter /></a>
@@ -28,38 +30,38 @@ export const Footer = () => {
                     </div>
 
                     <div className={styles.section}>
-                        <h4>Quick Links</h4>
+                        <h4>{t('footer.quick_links')}</h4>
                         <ul className={styles.links}>
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/explore">Explore</Link></li>
-                            <li><Link to="/popular-products">Popular</Link></li>
-                            <li><Link to="/authors">Authors</Link></li>
+                            <li><Link to="/">{t('footer.home')}</Link></li>
+                            <li><Link to="/explore">{t('footer.explore')}</Link></li>
+                            <li><Link to="/popular-products">{t('footer.popular')}</Link></li>
+                            <li><Link to="/authors">{t('footer.authors')}</Link></li>
                         </ul>
                     </div>
 
                     <div className={styles.section}>
-                        <h4>Support</h4>
+                        <h4>{t('footer.support')}</h4>
                         <ul className={styles.links}>
-                            <li><Link to="/help">Help Center</Link></li>
-                            <li><Link to="/contact-us">Contact Us</Link></li>
-                            <li><Link to="/become-seller">Become Seller</Link></li>
-                            <li><a href="#">Terms of Service</a></li>
+                            <li><Link to="/help">{t('footer.help_center')}</Link></li>
+                            <li><Link to="/contact-us">{t('footer.contact_us')}</Link></li>
+                            <li><Link to="/become-seller">{t('footer.become_seller')}</Link></li>
+                            <li><a href="#">{t('footer.terms')}</a></li>
                         </ul>
                     </div>
 
                     <div className={styles.section}>
-                        <h4>Company</h4>
+                        <h4>{t('footer.company')}</h4>
                         <ul className={styles.links}>
-                            <li><a href="#">About Us</a></li>
-                            <li><a href="#">Careers</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Refund Policy</a></li>
+                            <li><a href="#">{t('footer.about')}</a></li>
+                            <li><a href="#">{t('footer.careers')}</a></li>
+                            <li><a href="#">{t('footer.privacy')}</a></li>
+                            <li><a href="#">{t('footer.refund')}</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div className={styles.bottom}>
-                    <p>© {currentYear} Pixer. All rights reserved. Made with ❤️ by REDQ</p>
+                    <p>{t('footer.copyright', { year: currentYear })} <FiHeart style={{ display: 'inline', verticalAlign: 'middle', color: 'var(--danger)', margin: '0 4px' }} /> {t('footer.by')}</p>
                 </div>
             </div>
         </footer>

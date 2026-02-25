@@ -1,47 +1,53 @@
-import type { ApiResponse, User } from '@/types'
+import { apiClient } from './apiClient'
+
+interface ProfileResponse {
+    id: number
+    username: string
+    email: string
+    firstName: string | null
+    lastName: string | null
+    phone: string | null
+    avatar: string | null
+    enabled: boolean
+    emailVerified: boolean
+    roles: string[]
+    createdAt: string
+    lastLoginAt: string | null
+}
+
+interface UpdateProfileData {
+    firstName?: string
+    lastName?: string
+    phone?: string
+}
+
+interface ChangePasswordData {
+    currentPassword: string
+    newPassword: string
+    confirmPassword: string
+}
 
 export const userService = {
-    async getProfile(): Promise<ApiResponse<User>> {
-        try {
-            // Simulate API call - Replace with: apiClient.get('/users/profile')
-            await new Promise(resolve => setTimeout(resolve, 800))
-
-            const userStr = localStorage.getItem('user')
-            if (userStr) {
-                const user = JSON.parse(userStr)
-                return {
-                    success: true,
-                    data: user,
-                }
-            }
-
-            throw new Error('User not found')
-        } catch (error: any) {
-            throw new Error(error.message || 'Failed to fetch profile')
-        }
+    async getProfile(): Promise<ProfileResponse> {
+        const res = await apiClient.get<{ data: ProfileResponse }>('/v1/users/me')
+        return res.data
     },
 
-    async updateProfile(data: Partial<User>): Promise<ApiResponse<User>> {
-        try {
-            // Simulate API call - Replace with: apiClient.put('/users/profile', data)
-            await new Promise(resolve => setTimeout(resolve, 800))
+    async updateProfile(data: UpdateProfileData): Promise<ProfileResponse> {
+        const res = await apiClient.put<{ data: ProfileResponse }>('/v1/users/me', data)
+        return res.data
+    },
 
-            const userStr = localStorage.getItem('user')
-            if (userStr) {
-                const user = JSON.parse(userStr)
-                const updatedUser = { ...user, ...data }
-                localStorage.setItem('user', JSON.stringify(updatedUser))
+    async changePassword(data: ChangePasswordData): Promise<void> {
+        await apiClient.put('/v1/users/me/password', data)
+    },
 
-                return {
-                    success: true,
-                    data: updatedUser,
-                    message: 'Profile updated successfully',
-                }
-            }
-
-            throw new Error('User not found')
-        } catch (error: any) {
-            throw new Error(error.message || 'Failed to update profile')
-        }
+    async uploadAvatar(file: File): Promise<ProfileResponse> {
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await apiClient.post<{ data: ProfileResponse }>('/v1/users/me/avatar', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+        return res.data
     },
 }
